@@ -814,11 +814,6 @@ fn resolve_expr(visitor: &mut RegionResolutionVisitor, expr: &hir::Expr) {
                 terminating(body.id);
             }
 
-            hir::ExprWhile(ref expr, ref body, _) => {
-                terminating(expr.id);
-                terminating(body.id);
-            }
-
             hir::ExprMatch(..) => {
                 visitor.cx.var_parent = expr_extent;
             }

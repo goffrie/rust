@@ -190,39 +190,6 @@ impl<'a, 'tcx> CFGBuilder<'a, 'tcx> {
                 self.add_ast_node(expr.id, &[then_exit, else_exit])      // 4, 5
             }
 
-            hir::ExprWhile(ref cond, ref body, _) => {
-                //
-                //         [pred]
-                //           |
-                //           v 1
-                //       [loopback] <--+ 5
-                //           |         |
-                //           v 2       |
-                //   +-----[cond]      |
-                //   |       |         |
-                //   |       v 4       |
-                //   |     [body] -----+
-                //   v 3
-                // [expr]
-                //
-                // Note that `break` and `continue` statements
-                // may cause additional edges.
-
-                // Is the condition considered part of the loop?
-                let loopback = self.add_dummy_node(&[pred]);              // 1
-                let cond_exit = self.expr(&cond, loopback);             // 2
-                let expr_exit = self.add_ast_node(expr.id, &[cond_exit]); // 3
-                self.loop_scopes.push(LoopScope {
-                    loop_id: expr.id,
-                    continue_index: loopback,
-                    break_index: expr_exit
-                });
-                let body_exit = self.block(&body, cond_exit);          // 4
-                self.add_contained_edge(body_exit, loopback);            // 5
-                self.loop_scopes.pop();
-                expr_exit
-            }
-
             hir::ExprLoop(ref body, _) => {
                 //
                 //     [pred]

@@ -177,7 +177,7 @@ impl<'v, P> Visitor<'v> for LoopQueryVisitor<P> where P: FnMut(&hir::Expr_) -> b
         match e.node {
           // Skip inner loops, since a break in the inner loop isn't a
           // break inside the outer loop
-          hir::ExprLoop(..) | hir::ExprWhile(..) => {}
+          hir::ExprLoop(..) => {}
           _ => intravisit::walk_expr(self, e)
         }
     }

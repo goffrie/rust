@@ -146,20 +146,11 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
 
                 join_block.unit()
             }
-            ExprKind::Loop { condition: opt_cond_expr, body } => {
-                // [block] --> [loop_block] ~~> [loop_block_end] -1-> [exit_block]
+            ExprKind::Loop {  body } => {
+                // [block] --> [loop_block] ~~> [body_block_end]    [exit_block]
                 //                  ^                  |
-                //                  |                  0
                 //                  |                  |
-                //                  |                  v
-                //           [body_block_end] <~~~ [body_block]
-                //
-                // If `opt_cond_expr` is `None`, then the graph is somewhat simplified:
-                //
-                // [block] --> [loop_block / body_block ] ~~> [body_block_end]    [exit_block]
-                //                         ^                          |
-                //                         |                          |
-                //                         +--------------------------+
+                //                  +------------------+
                 //
 
                 let loop_block = this.cfg.start_new_block();
@@ -170,24 +161,6 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                                    TerminatorKind::Goto { target: loop_block });
 
                 let might_break = this.in_loop_scope(loop_block, exit_block, move |this| {
-                    // conduct the test, if necessary
-                    let body_block;
-                    if let Some(cond_expr) = opt_cond_expr {
-                        // This loop has a condition, ergo its exit_block is reachable.
-                        this.find_loop_scope(expr_span, None).might_break = true;
-
-                        let loop_block_end;
-                        let cond = unpack!(loop_block_end = this.as_operand(loop_block, cond_expr));
-                        body_block = this.cfg.start_new_block();
-                        this.cfg.terminate(loop_block_end, source_info,
-                                           TerminatorKind::If {
-                                               cond: cond,
-                                               targets: (body_block, exit_block)
-                                           });
-                    } else {
-                        body_block = loop_block;
-                    }
-
                     // The “return” value of the loop body must always be an unit, but we cannot
                     // reuse that as a “return” value of the whole loop expressions, because some
                     // loops are diverging (e.g. `loop {}`). Thus, we introduce a unit temporary as
@@ -195,7 +168,7 @@ impl<'a, 'gcx, 'tcx> Builder<'a, 'gcx, 'tcx> {
                     // immediately after the iteration is finished.
                     let tmp = this.get_unit_temp();
                     // Execute the body, branching back to the test.
-                    let body_block_end = unpack!(this.into(&tmp, body_block, body));
+                    let body_block_end = unpack!(this.into(&tmp, loop_block, body));
                     this.cfg.terminate(body_block_end, source_info,
                                        TerminatorKind::Goto { target: loop_block });
                 });

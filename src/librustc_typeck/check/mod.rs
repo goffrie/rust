@@ -3552,17 +3552,6 @@ impl<'a, 'gcx, 'tcx> FnCtxt<'a, 'gcx, 'tcx> {
             self.check_then_else(&cond, &then_blk, opt_else_expr.as_ref().map(|e| &**e),
                                  expr.span, expected)
           }
-          hir::ExprWhile(ref cond, ref body, _) => {
-            let cond_ty = self.check_expr_has_type(&cond, tcx.types.bool);
-            self.check_block_no_value(&body);
-            let body_ty = self.node_ty(body.id);
-            if cond_ty.references_error() || body_ty.references_error() {
-                tcx.types.err
-            }
-            else {
-                tcx.mk_nil()
-            }
-          }
           hir::ExprLoop(ref body, _) => {
             self.check_block_no_value(&body);
             if !may_break(tcx, expr.id, &body) {

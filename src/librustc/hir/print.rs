@@ -1365,16 +1365,6 @@ impl<'a> State<'a> {
             hir::ExprIf(ref test, ref blk, ref elseopt) => {
                 self.print_if(&test, &blk, elseopt.as_ref().map(|e| &**e))?;
             }
-            hir::ExprWhile(ref test, ref blk, opt_sp_name) => {
-                if let Some(sp_name) = opt_sp_name {
-                    self.print_name(sp_name.node)?;
-                    self.word_space(":")?;
-                }
-                self.head("while")?;
-                self.print_expr(&test)?;
-                space(&mut self.s)?;
-                self.print_block(&blk)?;
-            }
             hir::ExprLoop(ref blk, opt_sp_name) => {
                 if let Some(sp_name) = opt_sp_name {
                     self.print_name(sp_name.node)?;
@@ -2344,7 +2334,6 @@ fn expr_requires_semi_to_be_stmt(e: &hir::Expr) -> bool {
         hir::ExprIf(..) |
         hir::ExprMatch(..) |
         hir::ExprBlock(_) |
-        hir::ExprWhile(..) |
         hir::ExprLoop(..) => false,
         _ => true,
     }

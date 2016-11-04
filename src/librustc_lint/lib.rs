@@ -112,6 +112,7 @@ pub fn register_builtins(store: &mut lint::LintStore, sess: Option<&Session>) {
 
     add_early_builtin!(sess,
                        UnusedParens,
+                       WhileTrue,
                        );
 
     add_early_builtin_with_new!(sess,
@@ -120,7 +121,6 @@ pub fn register_builtins(store: &mut lint::LintStore, sess: Option<&Session>) {
 
     add_builtin!(sess,
                  HardwiredLints,
-                 WhileTrue,
                  ImproperCTypes,
                  VariantSizeDifferences,
                  BoxPointers,

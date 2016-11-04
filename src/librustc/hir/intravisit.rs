@@ -793,11 +793,6 @@ pub fn walk_expr<'v, V: Visitor<'v>>(visitor: &mut V, expression: &'v Expr) {
             visitor.visit_block(if_block);
             walk_list!(visitor, visit_expr, optional_else);
         }
-        ExprWhile(ref subexpression, ref block, ref opt_sp_name) => {
-            visitor.visit_expr(subexpression);
-            visitor.visit_block(block);
-            walk_opt_sp_name(visitor, opt_sp_name);
-        }
         ExprLoop(ref block, ref opt_sp_name) => {
             visitor.visit_block(block);
             walk_opt_sp_name(visitor, opt_sp_name);

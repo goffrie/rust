@@ -480,11 +480,6 @@ impl<'a, 'gcx, 'tcx> ExprUseVisitor<'a, 'gcx, 'tcx> {
                 self.walk_block(&blk);
             }
 
-            hir::ExprWhile(ref cond_expr, ref blk, _) => {
-                self.consume_expr(&cond_expr);
-                self.walk_block(&blk);
-            }
-
             hir::ExprUnary(op, ref lhs) => {
                 let pass_args = if op.is_by_value() {
                     PassArgs::ByValue

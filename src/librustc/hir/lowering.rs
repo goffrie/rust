@@ -1094,10 +1094,6 @@ impl<'a> LoweringContext<'a> {
 
                     hir::ExprIf(self.lower_expr(cond), self.lower_block(blk), else_opt)
                 }
-                ExprKind::While(ref cond, ref body, opt_ident) => {
-                    hir::ExprWhile(self.lower_expr(cond), self.lower_block(body),
-                                   self.lower_opt_sp_ident(opt_ident))
-                }
                 ExprKind::Loop(ref body, opt_ident) => {
                     hir::ExprLoop(self.lower_block(body), self.lower_opt_sp_ident(opt_ident))
                 }
@@ -1340,6 +1336,28 @@ impl<'a> LoweringContext<'a> {
                                                         contains_else_clause: contains_else_clause,
                                                     }),
                                      e.attrs.clone());
+                }
+
+                // Desguar ExprWhile
+                ExprKind::While(ref cond, ref body, opt_ident) => {
+                    let cond_expr = self.lower_expr(cond);
+                    let body_block = self.lower_block(body);
+                    let break_expr = self.expr_break(e.span, ThinVec::new());
+                    let break_block = self.block_expr(break_expr);
+                    let break_block_expr = self.expr_block(break_block, ThinVec::new());
+
+                    // if cond { body } else { break }
+                    let if_expr = self.expr_if(e.span,
+                                               cond_expr,
+                                               body_block,
+                                               Some(break_block_expr));
+
+                    let loop_block = self.block_expr(if_expr);
+                    let loop_expr = hir::ExprLoop(loop_block, self.lower_opt_sp_ident(opt_ident));
+
+                    // add attributes to the outer returned expr node
+                    let attrs = e.attrs.clone();
+                    return P(hir::Expr { id: e.id, node: loop_expr, span: e.span, attrs: attrs });
                 }
 
                 // Desugar ExprWhileLet
@@ -1726,6 +1744,15 @@ impl<'a> LoweringContext<'a> {
                   source: hir::MatchSource)
                   -> P<hir::Expr> {
         self.expr(span, hir::ExprMatch(arg, arms, source), ThinVec::new())
+    }
+
+    fn expr_if(&mut self,
+               span: Span,
+               cond: P<hir::Expr>,
+               then_branch: P<hir::Block>,
+               else_branch: Option<P<hir::Expr>>)
+               -> P<hir::Expr> {
+        self.expr(span, hir::ExprIf(cond, then_branch, else_branch), ThinVec::new())
     }
 
     fn expr_block(&mut self, b: P<hir::Block>, attrs: ThinVec<Attribute>) -> P<hir::Expr> {

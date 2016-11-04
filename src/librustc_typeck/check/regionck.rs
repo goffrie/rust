@@ -768,16 +768,6 @@ impl<'a, 'gcx, 'tcx, 'v> Visitor<'v> for RegionCtxt<'a, 'gcx, 'tcx> {
                 self.set_repeating_scope(repeating_scope);
             }
 
-            hir::ExprWhile(ref cond, ref body, _) => {
-                let repeating_scope = self.set_repeating_scope(cond.id);
-                self.visit_expr(&cond);
-
-                self.set_repeating_scope(body.id);
-                self.visit_block(&body);
-
-                self.set_repeating_scope(repeating_scope);
-            }
-
             hir::ExprRet(Some(ref ret_expr)) => {
                 let call_site_scope = self.call_site_scope;
                 debug!("visit_expr ExprRet ret_expr.id {} call_site_scope: {:?}",

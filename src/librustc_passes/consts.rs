@@ -605,7 +605,6 @@ fn check_expr<'a, 'tcx>(v: &mut CheckCrateVisitor<'a, 'tcx>, e: &hir::Expr, node
         hir::ExprIf(..) |
 
         // Loops (not very meaningful in constants).
-        hir::ExprWhile(..) |
         hir::ExprLoop(..) |
 
         // More control flow (also not very meaningful).

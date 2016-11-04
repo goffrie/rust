@@ -890,10 +890,6 @@ pub enum Expr_ {
     ///
     /// `if expr { block } else { expr }`
     ExprIf(P<Expr>, P<Block>, Option<P<Expr>>),
-    /// A while loop, with an optional label
-    ///
-    /// `'label: while expr { block }`
-    ExprWhile(P<Expr>, P<Block>, Option<Spanned<Name>>),
     /// Conditionless loop (can be exited with break, continue, or return)
     ///
     /// `'label: loop { block }`

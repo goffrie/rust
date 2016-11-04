@@ -46,10 +46,6 @@ impl<'a, 'v> Visitor<'v> for CheckLoopVisitor<'a> {
 
     fn visit_expr(&mut self, e: &hir::Expr) {
         match e.node {
-            hir::ExprWhile(ref e, ref b, _) => {
-                self.visit_expr(&e);
-                self.with_context(Loop, |v| v.visit_block(&b));
-            }
             hir::ExprLoop(ref b, _) => {
                 self.with_context(Loop, |v| v.visit_block(&b));
             }

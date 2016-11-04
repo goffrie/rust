@@ -572,12 +572,8 @@ fn make_mirror_unadjusted<'a, 'gcx, 'tcx>(cx: &mut Cx<'a, 'gcx, 'tcx>,
             ExprKind::If { condition: cond.to_ref(),
                            then: block::to_expr_ref(cx, then),
                            otherwise: otherwise.to_ref() },
-        hir::ExprWhile(ref cond, ref body, _) =>
-            ExprKind::Loop { condition: Some(cond.to_ref()),
-                             body: block::to_expr_ref(cx, body) },
         hir::ExprLoop(ref body, _) =>
-            ExprKind::Loop { condition: None,
-                             body: block::to_expr_ref(cx, body) },
+            ExprKind::Loop { body: block::to_expr_ref(cx, body) },
         hir::ExprField(ref source, name) => {
             let index = match cx.tcx.expr_ty_adjusted(source).sty {
                 ty::TyAdt(adt_def, _) =>

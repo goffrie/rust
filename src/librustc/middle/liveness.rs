@@ -105,7 +105,6 @@
 //!   only dead if the end of the function's block can never be reached.
 //!   It is the responsibility of typeck to ensure that there are no
 //!   `return` expressions in a function declared as diverging.
-use self::LoopKind::*;
 use self::LiveNodeKind::*;
 use self::VarKind::*;
 
@@ -132,14 +131,6 @@ use hir::Expr;
 use hir;
 use hir::print::{expr_to_string, block_to_string};
 use hir::intravisit::{self, Visitor, FnKind};
-
-/// For use with `propagate_through_loop`.
-enum LoopKind<'a> {
-    /// An endless `loop` loop.
-    LoopLoop,
-    /// A `while` loop, with the given expression as condition.
-    WhileLoop(&'a Expr),
-}
 
 #[derive(Copy, Clone, PartialEq)]
 struct Variable(usize);
@@ -479,7 +470,7 @@ fn visit_expr(ir: &mut IrMaps, expr: &Expr) {
       }
 
       // live nodes required for interesting control flow:
-      hir::ExprIf(..) | hir::ExprMatch(..) | hir::ExprWhile(..) | hir::ExprLoop(..) => {
+      hir::ExprIf(..) | hir::ExprMatch(..) | hir::ExprLoop(..) => {
         ir.add_live_node_for_node(expr.id, ExprNode(expr.span));
         intravisit::walk_expr(ir, expr);
       }
@@ -994,14 +985,10 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
             self.propagate_through_expr(&cond, ln)
           }
 
-          hir::ExprWhile(ref cond, ref blk, _) => {
-            self.propagate_through_loop(expr, WhileLoop(&cond), &blk, succ)
-          }
-
           // Note that labels have been resolved, so we don't need to look
           // at the label ident
           hir::ExprLoop(ref blk, _) => {
-            self.propagate_through_loop(expr, LoopLoop, &blk, succ)
+            self.propagate_through_loop(expr, &blk, succ)
           }
 
           hir::ExprMatch(ref e, ref arms, _) => {
@@ -1287,7 +1274,6 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
 
     fn propagate_through_loop(&mut self,
                               expr: &Expr,
-                              kind: LoopKind,
                               body: &hir::Block,
                               succ: LiveNode)
                               -> LiveNode {
@@ -1315,43 +1301,22 @@ impl<'a, 'tcx> Liveness<'a, 'tcx> {
         let mut first_merge = true;
         let ln = self.live_node(expr.id, expr.span);
         self.init_empty(ln, succ);
-        match kind {
-            LoopLoop => {}
-            _ => {
-                // If this is not a `loop` loop, then it's possible we bypass
-                // the body altogether. Otherwise, the only way is via a `break`
-                // in the loop body.
-                self.merge_from_succ(ln, succ, first_merge);
-                first_merge = false;
-            }
-        }
         debug!("propagate_through_loop: using id for loop body {} {}",
                expr.id, block_to_string(body));
 
-        let cond_ln = match kind {
-            LoopLoop => ln,
-            WhileLoop(ref cond) => self.propagate_through_expr(&cond, ln),
-        };
         let body_ln = self.with_loop_nodes(expr.id, succ, ln, |this| {
-            this.propagate_through_block(body, cond_ln)
+            this.propagate_through_block(body, ln)
         });
 
         // repeat until fixed point is reached:
         while self.merge_from_succ(ln, body_ln, first_merge) {
             first_merge = false;
 
-            let new_cond_ln = match kind {
-                LoopLoop => ln,
-                WhileLoop(ref cond) => {
-                    self.propagate_through_expr(&cond, ln)
-                }
-            };
-            assert!(cond_ln == new_cond_ln);
             assert!(body_ln == self.with_loop_nodes(expr.id, succ, ln,
-            |this| this.propagate_through_block(body, cond_ln)));
+            |this| this.propagate_through_block(body, ln)));
         }
 
-        cond_ln
+        ln
     }
 
     fn with_loop_nodes<R, F>(&mut self,
@@ -1434,7 +1399,7 @@ fn check_expr(this: &mut Liveness, expr: &Expr) {
 
       // no correctness conditions related to liveness
       hir::ExprCall(..) | hir::ExprMethodCall(..) | hir::ExprIf(..) |
-      hir::ExprMatch(..) | hir::ExprWhile(..) | hir::ExprLoop(..) |
+      hir::ExprMatch(..) | hir::ExprLoop(..) |
       hir::ExprIndex(..) | hir::ExprField(..) | hir::ExprTupField(..) |
       hir::ExprArray(..) | hir::ExprTup(..) | hir::ExprBinary(..) |
       hir::ExprCast(..) | hir::ExprUnary(..) | hir::ExprRet(..) |

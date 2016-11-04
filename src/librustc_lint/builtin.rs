@@ -71,10 +71,10 @@ impl LintPass for WhileTrue {
     }
 }
 
-impl LateLintPass for WhileTrue {
-    fn check_expr(&mut self, cx: &LateContext, e: &hir::Expr) {
-        if let hir::ExprWhile(ref cond, ..) = e.node {
-            if let hir::ExprLit(ref lit) = cond.node {
+impl EarlyLintPass for WhileTrue {
+    fn check_expr(&mut self, cx: &EarlyContext, e: &ast::Expr) {
+        if let ast::ExprKind::While(ref cond, ..) = e.node {
+            if let ast::ExprKind::Lit(ref lit) = cond.node {
                 if let ast::LitKind::Bool(true) = lit.node {
                     cx.span_lint(WHILE_TRUE,
                                  e.span,

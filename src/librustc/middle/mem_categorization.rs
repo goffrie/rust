@@ -504,7 +504,7 @@ impl<'a, 'gcx, 'tcx> MemCategorizationContext<'a, 'gcx, 'tcx> {
           hir::ExprUnary(..) |
           hir::ExprMethodCall(..) | hir::ExprCast(..) |
           hir::ExprArray(..) | hir::ExprTup(..) | hir::ExprIf(..) |
-          hir::ExprBinary(..) | hir::ExprWhile(..) |
+          hir::ExprBinary(..) |
           hir::ExprBlock(..) | hir::ExprLoop(..) | hir::ExprMatch(..) |
           hir::ExprLit(..) | hir::ExprBreak(..) |
           hir::ExprAgain(..) | hir::ExprStruct(..) | hir::ExprRepeat(..) |
