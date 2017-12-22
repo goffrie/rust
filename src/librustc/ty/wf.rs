@@ -246,6 +246,8 @@ impl<'a, 'gcx, 'tcx> WfPredicates<'a, 'gcx, 'tcx> {
                 ty::GeneratorWitness(..) |
                 ty::Never |
                 ty::Param(_) |
+                ty::UnusedParam |
+                ty::LayoutOnlyParam(..) |
                 ty::Bound(..) |
                 ty::Placeholder(..) |
                 ty::Foreign(..) => {

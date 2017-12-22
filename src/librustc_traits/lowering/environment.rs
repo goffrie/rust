@@ -105,6 +105,8 @@ impl ClauseVisitor<'set, 'a, 'tcx> {
             ty::Param(..) |
             ty::Bound(..) => (),
 
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::GeneratorWitness(..) |
             ty::UnnormalizedProjection(..) |
             ty::Error => {

@@ -515,6 +515,8 @@ pub fn characteristic_def_id_of_type(ty: Ty<'_>) -> Option<DefId> {
         ty::UnnormalizedProjection(..) |
         ty::Param(_) |
         ty::Opaque(..) |
+        ty::UnusedParam |
+        ty::LayoutOnlyParam(..) |
         ty::Infer(_) |
         ty::Bound(..) |
         ty::Error |

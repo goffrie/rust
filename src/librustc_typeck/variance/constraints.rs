@@ -329,6 +329,8 @@ impl<'a, 'tcx> ConstraintContext<'a, 'tcx> {
 
             ty::Placeholder(..) |
             ty::UnnormalizedProjection(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::GeneratorWitness(..) |
             ty::Bound(..) |
             ty::Infer(..) => {

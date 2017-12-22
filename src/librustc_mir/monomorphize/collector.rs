@@ -309,6 +309,8 @@ pub fn collect_crate_mono_items<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         });
     }
 
+    //tcx.sess.warn(&format!("{:#?}", visited));
+
     (visited.into_inner(), inlining_map.into_inner())
 }
 
@@ -366,6 +368,7 @@ fn collect_items_rec<'a, 'tcx: 'a>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
 
             // Sanity check whether this ended up being collected accidentally
             debug_assert!(should_monomorphize_locally(tcx, &instance));
+            let instance = tcx.collapse_interchangable_instances(instance);
 
             let ty = instance.ty(tcx);
             visit_drop_use(tcx, ty, true, &mut neighbors);
@@ -385,6 +388,7 @@ fn collect_items_rec<'a, 'tcx: 'a>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         MonoItem::Fn(instance) => {
             // Sanity check whether this ended up being collected accidentally
             debug_assert!(should_monomorphize_locally(tcx, &instance));
+            let instance = tcx.collapse_interchangable_instances(instance);
 
             // Keep track of the monomorphization recursion depth
             recursion_depth_reset = Some(check_recursion_limit(tcx,
@@ -682,6 +686,8 @@ fn visit_instance_use<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
         return
     }
 
+    let instance = tcx.collapse_interchangable_instances(instance);
+
     match instance.def {
         ty::InstanceDef::Intrinsic(def_id) => {
             if !is_direct_call {
@@ -904,6 +910,7 @@ fn create_mono_items_for_vtable_methods<'a, 'tcx>(tcx: TyCtxt<'a, 'tcx, 'tcx>,
                     ty::ParamEnv::reveal_all(),
                     def_id,
                     substs).unwrap())
+                .map(|instance| tcx.collapse_interchangable_instances(instance))
                 .filter(|&instance| should_monomorphize_locally(tcx, &instance))
                 .map(|instance| create_fn_mono_item(instance));
             output.extend(methods);

@@ -21,7 +21,8 @@ use abi::Abi;
 use common::CodegenCx;
 use builder::Builder;
 use monomorphize::Instance;
-use rustc::ty::{self, ParamEnv, Ty, InstanceDef};
+use rustc::ty::{self, ParamEnv, Ty, TypeFoldable, InstanceDef};
+use rustc::ty::fold::TypeVisitor;
 use rustc::mir;
 use rustc::session::config::{self, DebugInfo};
 use rustc::util::nodemap::{DefIdMap, FxHashMap, FxHashSet};
@@ -235,7 +236,22 @@ impl DebugInfoMethods<'tcx> for CodegenCx<'ll, 'tcx> {
         llfn: &'ll Value,
         mir: &mir::Mir,
     ) -> FunctionDebugContext<&'ll DISubprogram> {
-        if self.sess().opts.debuginfo == DebugInfo::None {
+        struct UnusedParamVisitor(bool);
+        impl<'tcx> TypeVisitor<'tcx> for UnusedParamVisitor {
+            fn visit_ty(&mut self, ty: Ty<'tcx>) -> bool {
+                match ty.sty {
+                    ty::UnusedParam | ty::LayoutOnlyParam(..) => {
+                        self.0 = true;
+                    }
+                    _ => {}
+                }
+                ty.super_visit_with(self)
+            }
+        }
+        let mut has_unused_param_visitor = UnusedParamVisitor(false);
+        mir.visit_with(&mut has_unused_param_visitor);
+
+        if self.sess().opts.debuginfo == DebugInfo::None || has_unused_param_visitor.0 {
             return FunctionDebugContext::DebugInfoDisabled;
         }
 

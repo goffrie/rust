@@ -413,6 +413,8 @@ impl<'cx, 'gcx, 'tcx> TypeFolder<'gcx, 'tcx> for Canonicalizer<'cx, 'gcx, 'tcx> 
             | ty::Projection(..)
             | ty::UnnormalizedProjection(..)
             | ty::Foreign(..)
+            | ty::UnusedParam
+            | ty::LayoutOnlyParam(..)
             | ty::Param(..)
             | ty::Opaque(..) => {
                 if t.flags.intersects(self.needs_canonical_flags) {

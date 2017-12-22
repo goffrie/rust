@@ -10,6 +10,7 @@ use rustc_data_structures::indexed_vec::Idx;
 use ty::subst::{Substs, Subst, Kind, UnpackedKind};
 use ty::{self, AdtDef, TypeFlags, Ty, TyCtxt, TypeFoldable};
 use ty::{List, TyS, ParamEnvAnd, ParamEnv};
+use ty::layout::{Size, Align};
 use util::captures::Captures;
 use mir::interpret::{Scalar, Pointer};
 
@@ -194,7 +195,13 @@ pub enum TyKind<'tcx> {
     /// A placeholder type - universally quantified higher-ranked type.
     Placeholder(ty::PlaceholderType),
 
-    /// A type variable used during type checking.
+    /// Substitution for a unused type parameter; see rustc_mir::monomorphize::deduplicate_instances
+    UnusedParam,
+
+    /// Substitution for a type parameter whose size and layout is the onlything that matters
+    LayoutOnlyParam(Size, Align),
+
+    /// A type variable used during type-checking.
     Infer(InferTy),
 
     /// A placeholder for a type which could not be computed; this is
@@ -1980,6 +1987,8 @@ impl<'a, 'gcx, 'tcx> TyS<'tcx> {
             Tuple(..) |
             Foreign(..) |
             Param(_) |
+            UnusedParam |
+            LayoutOnlyParam(..) |
             Bound(..) |
             Placeholder(..) |
             Infer(_) |
@@ -2047,6 +2056,8 @@ impl<'a, 'gcx, 'tcx> TyS<'tcx> {
 
             ty::Bound(..) |
             ty::Placeholder(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::Infer(ty::FreshTy(_)) |
             ty::Infer(ty::FreshIntTy(_)) |
             ty::Infer(ty::FreshFloatTy(_)) =>

@@ -596,8 +596,13 @@ for ty::TyKind<'gcx>
             Char  |
             Str   |
             Error |
-            Never => {
+            Never |
+            UnusedParam => {
                 // Nothing more to hash.
+            }
+            LayoutOnlyParam(size, align) => {
+                size.hash_stable(hcx, hasher);
+                align.hash_stable(hcx, hasher);
             }
             Int(int_ty) => {
                 int_ty.hash_stable(hcx, hasher);

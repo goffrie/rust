@@ -211,6 +211,7 @@ impl<'a, 'tcx, V> TypeVisitor<'tcx> for DefIdVisitorSkeleton<'_, 'a, 'tcx, V>
             ty::Array(..) | ty::Slice(..) | ty::Tuple(..) |
             ty::RawPtr(..) | ty::Ref(..) | ty::FnPtr(..) |
             ty::Param(..) | ty::Error | ty::GeneratorWitness(..) => {}
+            ty::UnusedParam | ty::LayoutOnlyParam(..) |
             ty::Bound(..) | ty::Placeholder(..) | ty::Infer(..) =>
                 bug!("unexpected type: {:?}", ty),
         }

@@ -2464,9 +2464,10 @@ impl<'a, 'gcx, 'tcx> AdtDef {
 
             Placeholder(..) |
             Bound(..) |
+            UnusedParam |
+            LayoutOnlyParam(..) |
             Infer(..) => {
-                bug!("unexpected type `{:?}` in sized_constraint_for_ty",
-                     ty)
+                bug!("unexpected type `{:?}` in sized_constraint_for_ty", ty)
             }
         };
         debug!("sized_constraint_for_ty({:?}) = {:?}", ty, result);

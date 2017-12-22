@@ -273,6 +273,10 @@ fn dtorck_constraint_for_ty<'a, 'gcx, 'tcx>(
             // be fully resolved.
             Err(NoSolution)
         }
+
+        ty::UnusedParam | ty::LayoutOnlyParam(..) => {
+            bug!("Unexpected {:?} in dtorck_constraint_for_ty", ty);
+        }
     };
 
     debug!("dtorck_constraint_for_ty({:?}) = {:?}", ty, result);

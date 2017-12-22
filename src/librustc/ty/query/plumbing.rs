@@ -1224,6 +1224,7 @@ pub fn force_from_dep_node<'a, 'gcx, 'lcx>(tcx: TyCtxt<'a, 'gcx, 'lcx>,
         DepKind::MethodAutoderefSteps |
         DepKind::InstanceDefSizeEstimate |
         DepKind::ProgramClausesForEnv |
+        DepKind::CollapseInterchangableInstances |
 
         // This one should never occur in this context
         DepKind::Null => {

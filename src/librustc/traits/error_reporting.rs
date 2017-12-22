@@ -273,6 +273,9 @@ impl<'a, 'gcx, 'tcx> InferCtxt<'a, 'gcx, 'tcx> {
                 ty::GeneratorWitness(..) => Some(20),
                 ty::Placeholder(..) | ty::Bound(..) | ty::Infer(..) | ty::Error => None,
                 ty::UnnormalizedProjection(..) => bug!("only used with chalk-engine"),
+                ty::UnusedParam | ty::LayoutOnlyParam(..) => {
+                    bug!("unexpected {:?} in fuzzy_match_tys", t);
+                }
             }
         }
 

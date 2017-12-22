@@ -2131,12 +2131,14 @@ macro_rules! sty_debug_print {
                     region_infer: 0, ty_infer: 0, both_infer: 0,
                 };
                 $(let mut $variant = total;)*
+                let mut UnusedParam = total;
 
                 for &Interned(t) in tcx.interners.type_.borrow().keys() {
                     let variant = match t.sty {
                         ty::Bool | ty::Char | ty::Int(..) | ty::Uint(..) |
                             ty::Float(..) | ty::Str | ty::Never => continue,
                         ty::Error => /* unimportant */ continue,
+                        ty::UnusedParam => &mut UnusedParam,
                         $(ty::$variant(..) => &mut $variant,)*
                     };
                     let region = t.flags.intersects(ty::TypeFlags::HAS_RE_INFER);
@@ -2177,7 +2179,8 @@ impl<'a, 'tcx> TyCtxt<'a, 'tcx, 'tcx> {
             self,
             Adt, Array, Slice, RawPtr, Ref, FnDef, FnPtr, Placeholder,
             Generator, GeneratorWitness, Dynamic, Closure, Tuple, Bound,
-            Param, Infer, UnnormalizedProjection, Projection, Opaque, Foreign);
+            Param, LayoutOnlyParam, Infer, UnnormalizedProjection, Projection,
+            Opaque, Foreign);
 
         println!("Substs interner: #{}", self.interners.substs.borrow().len());
         println!("Region interner: #{}", self.interners.region.borrow().len());

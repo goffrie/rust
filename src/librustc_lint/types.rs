@@ -719,6 +719,8 @@ impl<'a, 'tcx> ImproperCTypesVisitor<'a, 'tcx> {
             ty::Param(..) |
             ty::Infer(..) |
             ty::Bound(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::Error |
             ty::Closure(..) |
             ty::Generator(..) |
@@ -727,7 +729,7 @@ impl<'a, 'tcx> ImproperCTypesVisitor<'a, 'tcx> {
             ty::UnnormalizedProjection(..) |
             ty::Projection(..) |
             ty::Opaque(..) |
-            ty::FnDef(..) => bug!("Unexpected type in foreign function"),
+            ty::FnDef(..) => bug!("Unexpected type `{:?}` in foreign function", ty),
         }
     }
 

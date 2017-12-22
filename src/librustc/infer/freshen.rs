@@ -189,7 +189,9 @@ impl<'a, 'gcx, 'tcx> TypeFolder<'gcx, 'tcx> for TypeFreshener<'a, 'gcx, 'tcx> {
             }
 
             ty::Placeholder(..) |
-            ty::Bound(..) => bug!("unexpected type {:?}", t),
+            ty::Bound(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) => bug!("unexpected type {:?}", t),
         }
     }
 }

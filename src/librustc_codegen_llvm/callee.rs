@@ -29,6 +29,10 @@ pub fn get_fn(
 
     debug!("get_fn(instance={:?})", instance);
 
+    let instance = tcx.collapse_interchangable_instances(instance);
+
+    debug!("get_fn(collapsed_instance={:?})", instance);
+
     assert!(!instance.substs.needs_infer());
     assert!(!instance.substs.has_escaping_bound_vars());
     assert!(!instance.substs.has_param_types());

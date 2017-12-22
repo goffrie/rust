@@ -5,7 +5,7 @@ use ty::subst::{self, Subst};
 use ty::{BrAnon, BrEnv, BrFresh, BrNamed};
 use ty::{Bool, Char, Adt};
 use ty::{Error, Str, Array, Slice, Float, FnDef, FnPtr};
-use ty::{Param, Bound, RawPtr, Ref, Never, Tuple};
+use ty::{Param, UnusedParam, LayoutOnlyParam, Bound, RawPtr, Ref, Never, Tuple};
 use ty::{Closure, Generator, GeneratorWitness, Foreign, Projection, Opaque};
 use ty::{Placeholder, UnnormalizedProjection, Dynamic, Int, Uint, Infer};
 use ty::{self, Ty, TyCtxt, TypeFoldable, GenericParamCount, GenericParamDefKind};
@@ -1263,6 +1263,7 @@ define_print! {
                 Infer(infer_ty) => write!(f, "{}", infer_ty),
                 Error => write!(f, "[type error]"),
                 Param(ref param_ty) => write!(f, "{}", param_ty),
+                UnusedParam | LayoutOnlyParam(..) => write!(f, "[unused type param]"),
                 Bound(debruijn, bound_ty) => {
                     match bound_ty.kind {
                         ty::BoundTyKind::Anon => {

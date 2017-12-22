@@ -159,6 +159,9 @@ impl<'a, 'gcx, 'tcx> TyCtxt<'a, 'gcx, 'tcx> {
                     self.compute_components(subty, out);
                 }
             }
+            ty::UnusedParam | ty::LayoutOnlyParam(_, _) => {
+                bug!("Unexpected UnusedParam in compute_components");
+            }
         }
     }
 

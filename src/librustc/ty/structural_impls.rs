@@ -754,6 +754,8 @@ impl<'tcx> TypeFoldable<'tcx> for Ty<'tcx> {
             ty::Param(..) |
             ty::Bound(..) |
             ty::Placeholder(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::Never |
             ty::Foreign(..) => return self
         };
@@ -802,6 +804,8 @@ impl<'tcx> TypeFoldable<'tcx> for Ty<'tcx> {
             ty::Bound(..) |
             ty::Placeholder(..) |
             ty::Param(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::Never |
             ty::Foreign(..) => false,
         }

@@ -382,6 +382,8 @@ impl<'a, 'tcx> DefPathBasedNames<'a, 'tcx> {
             ty::UnnormalizedProjection(..) |
             ty::Projection(..) |
             ty::Param(_) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::GeneratorWitness(_) |
             ty::Opaque(..) => {
                 if debug {

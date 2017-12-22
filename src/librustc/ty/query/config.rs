@@ -892,6 +892,12 @@ impl<'tcx> QueryDescription<'tcx> for queries::typeck_tables_of<'tcx> {
     }
 }
 
+impl<'tcx> QueryDescription<'tcx> for queries::collapse_interchangable_instances<'tcx> {
+    fn describe(_: TyCtxt<'_, '_, '_>, instance: ty::Instance<'tcx>) -> Cow<'static, str> {
+        format!("collapse interchangable instance {:?}", instance).into()
+    }
+}
+
 impl<'tcx> QueryDescription<'tcx> for queries::optimized_mir<'tcx> {
     #[inline]
     fn cache_on_disk(_: TyCtxt<'_, 'tcx, 'tcx>, def_id: Self::Key) -> bool {

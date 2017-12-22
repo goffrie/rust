@@ -1163,6 +1163,8 @@ impl<'a, 'tcx> LayoutCx<'tcx, TyCtxt<'a, 'tcx, 'tcx>> {
             ty::Bound(..) |
             ty::Placeholder(..) |
             ty::UnnormalizedProjection(..) |
+            ty::UnusedParam |
+            ty::LayoutOnlyParam(..) |
             ty::GeneratorWitness(..) |
             ty::Infer(_) => {
                 bug!("LayoutDetails::compute: unexpected type `{}`", ty)
@@ -1746,8 +1748,8 @@ impl<'a, 'tcx, C> TyLayoutMethods<'tcx, C> for Ty<'tcx>
             }
 
             ty::Projection(_) | ty::UnnormalizedProjection(..) | ty::Bound(..) |
-            ty::Placeholder(..) | ty::Opaque(..) | ty::Param(_) | ty::Infer(_) |
-            ty::Error => {
+            ty::Placeholder(..) | ty::Opaque(..) | ty::Param(_) | ty::UnusedParam |
+            ty::LayoutOnlyParam(..) | ty::Infer(_) | ty::Error => {
                 bug!("TyLayout::field_type: unexpected type `{}`", this.ty)
             }
         })

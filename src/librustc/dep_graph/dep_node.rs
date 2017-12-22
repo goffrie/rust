@@ -660,6 +660,7 @@ define_dep_nodes!( <'tcx>
     [] TypeOpNormalizePredicate(CanonicalTypeOpNormalizeGoal<'tcx, Predicate<'tcx>>),
     [] TypeOpNormalizePolyFnSig(CanonicalTypeOpNormalizeGoal<'tcx, PolyFnSig<'tcx>>),
     [] TypeOpNormalizeFnSig(CanonicalTypeOpNormalizeGoal<'tcx, FnSig<'tcx>>),
+    [] CollapseInterchangableInstances { instance: Instance<'tcx> },
 
     [] SubstituteNormalizeAndTestPredicates { key: (DefId, &'tcx Substs<'tcx>) },
     [] MethodAutoderefSteps(CanonicalTyGoal<'tcx>),

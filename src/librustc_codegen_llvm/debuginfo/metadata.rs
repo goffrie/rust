@@ -1884,6 +1884,8 @@ fn create_struct_stub(
     unique_type_id: UniqueTypeId,
     containing_scope: Option<&'ll DIScope>,
 ) -> &'ll DICompositeType {
+    // FIXME: ignore unused generic subsitutions
+    //cx.tcx.sess.warn(&format!("create_struct_stub({:?})", struct_type));
     let (struct_size, struct_align) = cx.size_and_align_of(struct_type);
 
     let name = SmallCStr::new(struct_type_name);

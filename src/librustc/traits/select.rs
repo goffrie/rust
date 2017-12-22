@@ -2429,7 +2429,8 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                 ))
             }
 
-            ty::Projection(_) | ty::Param(_) | ty::Opaque(..) => None,
+            ty::Projection(_) | ty::Param(_) | ty::Opaque(..) |
+            ty::UnusedParam | ty::LayoutOnlyParam(..) => None,
             ty::Infer(ty::TyVar(_)) => Ambiguous,
 
             ty::UnnormalizedProjection(..)
@@ -2529,6 +2530,9 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                     self_ty
                 );
             }
+            ty::UnusedParam | ty::LayoutOnlyParam(_, _) => {
+                bug!("Unexpected {:?} in copy_clone_conditions", self_ty);
+            }
         }
     }
 
@@ -2562,6 +2566,8 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
             | ty::Placeholder(..)
             | ty::Dynamic(..)
             | ty::Param(..)
+            | ty::UnusedParam
+            | ty::LayoutOnlyParam(..)
             | ty::Foreign(..)
             | ty::Projection(..)
             | ty::Bound(..)

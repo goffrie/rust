@@ -165,6 +165,8 @@ fn assemble_builtin_sized_impls<'tcx>(
         ty::Dynamic(..) |
         ty::Opaque(..) => (),
 
+        ty::UnusedParam |
+        ty::LayoutOnlyParam(..) |
         ty::Bound(..) |
         ty::GeneratorWitness(..) => bug!("unexpected type {:?}", ty),
     }
@@ -558,6 +560,8 @@ impl ChalkInferenceContext<'cx, 'gcx, 'tcx> {
                         tcx.mk_clauses(clauses)
                     }
 
+                    ty::UnusedParam |
+                    ty::LayoutOnlyParam(..) |
                     ty::GeneratorWitness(..) |
                     ty::UnnormalizedProjection(..) |
                     ty::Bound(..) => {

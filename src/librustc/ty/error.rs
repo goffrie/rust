@@ -211,6 +211,7 @@ impl<'a, 'gcx, 'lcx, 'tcx> ty::TyS<'tcx> {
                     "type parameter".into()
                 }
             }
+            ty::UnusedParam | ty::LayoutOnlyParam(..) => "unused type parameter".into(),
             ty::Opaque(..) => "opaque type".into(),
             ty::Error => "type error".into(),
         }
