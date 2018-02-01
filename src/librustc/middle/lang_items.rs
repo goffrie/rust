@@ -278,6 +278,7 @@ language_item_table! {
 
     GeneratorStateLangItem,          "generator_state",         gen_state;
     GeneratorTraitLangItem,          "generator",               gen_trait;
+    ImmovableGeneratorTraitLangItem, "immovable_generator",     immov_gen_trait;
 
     EqTraitLangItem,                 "eq",                      eq_trait;
     OrdTraitLangItem,                "ord",                     ord_trait;

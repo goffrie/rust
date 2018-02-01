@@ -129,3 +129,33 @@ impl<'a, T> Generator for &'a mut T
         (**self).resume()
     }
 }
+
+/// A generator (see [`Generator`]) which can hold borrows to its locals while suspended.
+/// For this reason, it cannot be moved once it has started executing.
+#[cfg(not(stage0))]
+#[lang = "immovable_generator"]
+#[unstable(feature = "generator_trait", issue = "43122")]
+#[fundamental]
+pub trait ImmovableGenerator {
+    /// The type of value this generator yields.
+    ///
+    /// This associated type corresponds to the `yield` expression and the
+    /// values which are allowed to be returned each time a generator yields.
+    /// For example an iterator-as-a-generator would likely have this type as
+    /// `T`, the type being iterated over.
+    type Yield;
+
+    /// The type of value this generator returns.
+    ///
+    /// This corresponds to the type returned from a generator either with a
+    /// `return` statement or implicitly as the last expression of a generator
+    /// literal. For example futures would use this as `Result<T, E>` as it
+    /// represents a completed future.
+    type Return;
+
+    /// Resumes the execution of this generator. See [`Generator::resume`].
+    ///
+    /// # Unsafety
+    /// Once `resume` has been called, it is unsafe to move the generator.
+    unsafe fn resume(&mut self) -> GeneratorState<Self::Yield, Self::Return>;
+}

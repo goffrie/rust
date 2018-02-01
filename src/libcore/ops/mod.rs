@@ -197,8 +197,13 @@ pub use self::range::{RangeInclusive, RangeToInclusive};
 #[unstable(feature = "try_trait", issue = "42327")]
 pub use self::try::Try;
 
+#[cfg(stage0)]
 #[unstable(feature = "generator_trait", issue = "43122")]
 pub use self::generator::{Generator, GeneratorState};
+
+#[cfg(not(stage0))]
+#[unstable(feature = "generator_trait", issue = "43122")]
+pub use self::generator::{ImmovableGenerator, Generator, GeneratorState};
 
 #[unstable(feature = "placement_new_protocol", issue = "27779")]
 pub use self::place::{Place, Placer, InPlace, Boxed, BoxPlace};

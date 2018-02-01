@@ -1614,7 +1614,8 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
                                    candidates: &mut SelectionCandidateSet<'tcx>)
                                    -> Result<(),SelectionError<'tcx>>
     {
-        if self.tcx().lang_items().gen_trait() != Some(obligation.predicate.def_id()) {
+        if self.tcx().lang_items().gen_trait() != Some(obligation.predicate.def_id())
+            && self.tcx().lang_items().immov_gen_trait() != Some(obligation.predicate.def_id()) {
             return Ok(());
         }
 
@@ -1623,11 +1624,19 @@ impl<'cx, 'gcx, 'tcx> SelectionContext<'cx, 'gcx, 'tcx> {
         // type/region parameters
         let self_ty = *obligation.self_ty().skip_binder();
         match self_ty.sty {
-            ty::TyGenerator(..) => {
+            ty::TyGenerator(_, _, interior) => {
                 debug!("assemble_generator_candidates: self_ty={:?} obligation={:?}",
                        self_ty,
                        obligation);
 
+                let gen_trait = if interior.movable {
+                    self.tcx().lang_items().gen_trait()
+                } else {
+                    self.tcx().lang_items().immov_gen_trait()
+                };
+                if gen_trait != Some(obligation.predicate.def_id()) {
+                    return Ok(());
+                }
                 candidates.vec.push(GeneratorCandidate);
                 Ok(())
             }
