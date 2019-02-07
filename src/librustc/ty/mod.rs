@@ -451,6 +451,9 @@ bitflags! {
 
         const HAS_TY_PLACEHOLDER = 1 << 14;
 
+        /// Does this type contain any `UnusedParam`s?
+        const HAS_ERASED_TYPE = 1 << 15;
+
         const NEEDS_SUBST        = TypeFlags::HAS_PARAMS.bits |
                                    TypeFlags::HAS_SELF.bits |
                                    TypeFlags::HAS_RE_EARLY_BOUND.bits;
@@ -471,7 +474,8 @@ bitflags! {
                                   TypeFlags::HAS_FREE_LOCAL_NAMES.bits |
                                   TypeFlags::KEEP_IN_LOCAL_TCX.bits |
                                   TypeFlags::HAS_RE_LATE_BOUND.bits |
-                                  TypeFlags::HAS_TY_PLACEHOLDER.bits;
+                                  TypeFlags::HAS_TY_PLACEHOLDER.bits |
+                                  TypeFlags::HAS_ERASED_TYPE.bits;
     }
 }
 

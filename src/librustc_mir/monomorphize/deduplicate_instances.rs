@@ -47,19 +47,19 @@ pub(crate) fn collapse_interchangable_instances<'a, 'tcx>(
                     if false /*param.name.as_str().starts_with("<")*/ {
                         ty.into()
                     } else {
-                        /*#[allow(unused_mut)]
+                        #[allow(unused_mut)]
                         let mut mir = Vec::new();
                         ::util::write_mir_pretty(tcx, Some(instance.def_id()), &mut mir).unwrap();
                         let mut generics = Some(tcx.generics_of(instance.def_id()));
                         let mut pretty_generics = String::new();
                         loop {
                             if let Some(ref gen) = generics {
-                                for ty in &gen.types {
+                                for ty in &gen.params {
                                     pretty_generics.push_str(&format!(
                                         "{}:{} at {:?}, ",
                                         ty.index,
                                         ty.name,
-                                        tcx.def_span(ty.def_id)
+                                        /*tcx.def_span(ty.def_id)*/ "???"
                                     ));
                                 }
                             } else {
@@ -74,8 +74,8 @@ pub(crate) fn collapse_interchangable_instances<'a, 'tcx>(
                             instance,
                             pretty_generics,
                             String::from_utf8_lossy(&mir)
-                        ));*/
-                        tcx.mk_ty(ty::Never)
+                        ));
+                        tcx.mk_ty(ty::UnusedParam)
                     }
                 }
                 ParamUsage::LayoutUsed => {

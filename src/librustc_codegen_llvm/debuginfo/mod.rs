@@ -497,13 +497,18 @@ impl DebugInfoMethods<'tcx> for CodegenCx<'ll, 'tcx> {
                         &cx.tcx.type_of(impl_def_id),
                     );
 
-                    // Only "class" methods are generally understood by LLVM,
-                    // so avoid methods on other types (e.g., `<*mut T>::null`).
-                    match impl_self_ty.sty {
-                        ty::Adt(def, ..) if !def.is_box() => {
-                            Some(type_metadata(cx, impl_self_ty, syntax_pos::DUMMY_SP))
+                    if impl_self_ty.has_erased_type() {
+                        // Can't compute type metadata in this case.
+                        None
+                    } else {
+                        // Only "class" methods are generally understood by LLVM,
+                        // so avoid methods on other types (e.g., `<*mut T>::null`).
+                        match impl_self_ty.sty {
+                            ty::Adt(def, ..) if !def.is_box() => {
+                                Some(type_metadata(cx, impl_self_ty, syntax_pos::DUMMY_SP))
+                            }
+                            _ => None
                         }
-                        _ => None
                     }
                 } else {
                     // For trait method impls we still use the "parallel namespace"

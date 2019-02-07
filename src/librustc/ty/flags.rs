@@ -202,8 +202,11 @@ impl FlagComputation {
             &ty::FnPtr(f) => {
                 self.add_fn_sig(f);
             }
-            &ty::UnusedParam | ty::LayoutOnlyParam(_, _) => {
-                bug!("Unexpected {:?} in FlagComputation::for_sty", st);
+
+            // FIXME: are these legit?
+            &ty::UnusedParam |
+            &ty::LayoutOnlyParam(..) => {
+                self.add_flags(TypeFlags::HAS_ERASED_TYPE);
             }
         }
     }

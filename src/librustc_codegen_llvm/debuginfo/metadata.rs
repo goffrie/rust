@@ -559,7 +559,9 @@ pub fn type_metadata(
         ty::Char     |
         ty::Int(_)   |
         ty::Uint(_)  |
-        ty::Float(_) => {
+        ty::Float(_) |
+        ty::UnusedParam |
+        ty::LayoutOnlyParam(..) => {
             MetadataCreationResult::new(basic_type_metadata(cx, t), false)
         }
         ty::Tuple(ref elements) if elements.is_empty() => {
@@ -771,6 +773,7 @@ fn basic_type_metadata(cx: &CodegenCx<'ll, 'tcx>, t: Ty<'tcx>) -> &'ll DIType {
         ty::Float(float_ty) => {
             (float_ty.ty_to_string(), DW_ATE_float)
         },
+        ty::UnusedParam | ty::LayoutOnlyParam(..) => ("_", DW_ATE_unsigned),
         _ => bug!("debuginfo::basic_type_metadata - t is invalid type")
     };
 

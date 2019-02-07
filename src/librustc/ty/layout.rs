@@ -1160,10 +1160,21 @@ impl<'a, 'tcx> LayoutCx<'tcx, TyCtxt<'a, 'tcx, 'tcx>> {
                 tcx.layout_raw(param_env.and(normalized))?
             }
 
+            ty::UnusedParam => {
+                tcx.intern_layout(LayoutDetails {
+                    variants: Variants::Single { index: VariantIdx::new(0) },
+                    fields: FieldPlacement::Union(0),
+                    // FIXME
+                    abi: Abi::Uninhabited,
+                    align: dl.i8_align,
+                    size: Size::ZERO
+                })
+            }
+
             ty::Bound(..) |
             ty::Placeholder(..) |
             ty::UnnormalizedProjection(..) |
-            ty::UnusedParam |
+            // FIXME
             ty::LayoutOnlyParam(..) |
             ty::GeneratorWitness(..) |
             ty::Infer(_) => {

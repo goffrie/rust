@@ -126,6 +126,11 @@ pub trait TypeFoldable<'tcx>: fmt::Debug + Clone {
         self.has_type_flags(TypeFlags::HAS_RE_LATE_BOUND)
     }
 
+    /// True if there are any `ParamUnused`
+    fn has_erased_type(&self) -> bool {
+        self.has_type_flags(TypeFlags::HAS_ERASED_TYPE)
+    }
+
     /// A visitor that does not recurse into types, works like `fn walk_shallow` in `Ty`.
     fn visit_tys_shallow(&self, visit: impl FnMut(Ty<'tcx>) -> bool) -> bool {
 
